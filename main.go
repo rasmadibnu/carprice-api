@@ -9,7 +9,7 @@ import (
 func main() {
 	config.LoadEnv()
 	db := config.InitialDB()
-	config.Migration(db)
+	// config.Migration(db)
 
 	flag.Parse()
 	arg := flag.Arg(0)
