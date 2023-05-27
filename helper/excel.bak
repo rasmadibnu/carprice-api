@@ -1,0 +1,137 @@
+package helper
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+
+	"github.com/xuri/excelize/v2"
+)
+
+func InterfaceSlice(slice interface{}) []interface{} {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("InterfaceSlice() given a non-slice type")
+	}
+
+	if s.IsNil() {
+		return nil
+	}
+
+	ret := make([]interface{}, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		ret[i] = s.Index(i).Interface()
+	}
+
+	return ret
+}
+
+func RemoveGlob(path string) (err error) {
+	contents, err := filepath.Glob(path)
+	if err != nil {
+		return
+	}
+	for _, item := range contents {
+		err = os.RemoveAll(item)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+func PrepareAndReturnExcel(entity []interface{}, format []interface{}, password string) *excelize.File {
+	f := excelize.NewFile()
+
+	Date, err := f.NewStyle(&excelize.Style{NumFmt: 14})
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	formatDatetime := "yyyy-mm-dd hh:mm:ss.000"
+	Datetime, err := f.NewStyle(&excelize.Style{CustomNumFmt: &formatDatetime})
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	Number, err := f.NewStyle(&excelize.Style{NumFmt: 1})
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	streamWriter, err := f.NewStreamWriter("Sheet1")
+	if err != nil {
+		fmt.Print(err)
+		return nil
+	}
+
+	header := []interface{}{}
+	ety := entity[0]
+
+	for idx := 0; idx < reflect.TypeOf(ety).NumField(); idx++ {
+		val := reflect.Indirect(reflect.ValueOf(ety))
+		header = append(header, val.Type().Field(idx).Name)
+	}
+
+	if err := streamWriter.SetRow("A1", header); err != nil {
+		fmt.Print(err)
+		return nil
+	}
+
+	for rowID := 1; rowID < len(entity)+1; rowID++ {
+		row := make([]interface{}, len(header))
+		for colID := 0; colID < len(header); colID++ {
+			refCash := reflect.ValueOf(entity[rowID-1])
+			if format[colID] != nil {
+				switch format[colID] {
+				case "Date":
+					if !reflect.DeepEqual(refCash.Field(colID).Interface(), reflect.Zero(refCash.Field(colID).Type()).Interface()) {
+						row[colID] = excelize.Cell{Value: refCash.Field(colID).String()[0:10], StyleID: Date}
+					}
+				case "Datetime":
+					if !reflect.DeepEqual(refCash.Field(colID).Interface(), reflect.Zero(refCash.Field(colID).Type()).Interface()) {
+						replacer := strings.NewReplacer("T", " ", "Z", "")
+						datetime := replacer.Replace(refCash.Field(colID).String())
+						row[colID] = excelize.Cell{Value: datetime, StyleID: Datetime}
+					}
+				case "Time":
+					if !reflect.DeepEqual(refCash.Field(colID).Interface(), reflect.Zero(refCash.Field(colID).Type()).Interface()) {
+						replacer := strings.NewReplacer("T", "", "Z", "")
+						time := replacer.Replace(refCash.Field(colID).String()[10:20])
+						row[colID] = time
+					}
+				case "Number":
+					row[colID] = excelize.Cell{Value: refCash.Field(colID).Int(), StyleID: Number}
+				}
+			} else {
+				row[colID] = refCash.Field(colID)
+			}
+		}
+		cell, _ := excelize.CoordinatesToCellName(1, rowID+1)
+		if err := streamWriter.SetRow(cell, row); err != nil {
+			fmt.Print(err)
+			return nil
+		}
+	}
+
+	if err := streamWriter.Flush(); err != nil {
+		fmt.Print(err)
+		return nil
+	}
+
+	if err := RemoveGlob("/tmp/*"); err != nil {
+		fmt.Print(err)
+		return nil
+	}
+
+	if len(password) > 0 {
+		f.SaveAs("AZ.xlsx", excelize.Options{Password: password})
+	}
+	return f
+}
