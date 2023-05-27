@@ -1,12 +1,12 @@
 package routes
 
 import (
+	"api-cariprice/app/controller"
+	"api-cariprice/app/repository"
+	"api-cariprice/app/service"
+	"api-cariprice/config"
 	"net/http"
 	"os"
-	"otr-api/app/controller"
-	"otr-api/app/repository"
-	"otr-api/app/service"
-	"otr-api/config"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

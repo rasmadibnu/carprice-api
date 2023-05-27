@@ -1,4 +1,4 @@
-module otr-api
+module api-cariprice
 
 go 1.19
 

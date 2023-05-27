@@ -1,9 +1,9 @@
 package main
 
 import (
+	"api-cariprice/config"
+	"api-cariprice/routes"
 	"flag"
-	"otr-api/config"
-	"otr-api/routes"
 )
 
 func main() {

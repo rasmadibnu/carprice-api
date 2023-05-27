@@ -1,9 +1,9 @@
 package config
 
 import (
+	"api-cariprice/app/entity"
 	"fmt"
 	"log"
-	"otr-api/app/entity"
 )
 
 func Migration(db Database) {

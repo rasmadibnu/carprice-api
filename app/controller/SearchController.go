@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"api-cariprice/app/entity"
+	"api-cariprice/app/service"
+	"api-cariprice/helper"
 	"net/http"
-	"otr-api/app/entity"
-	"otr-api/app/service"
-	"otr-api/helper"
 	"strings"
 
 	"github.com/gin-gonic/gin"

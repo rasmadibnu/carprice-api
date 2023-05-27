@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"otr-api/app/entity"
-	"otr-api/config"
+	"api-cariprice/app/entity"
+	"api-cariprice/config"
 )
 
 type OTRRepository struct {
