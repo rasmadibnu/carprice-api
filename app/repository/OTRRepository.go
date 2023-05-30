@@ -49,7 +49,7 @@ func (r *OTRRepository) FindAll() ([]entity.Cars, error) {
 // @Description : Insert otr to database
 // @Author : rasmadibnu
 func (r *OTRRepository) Insert(otr entity.Cars) (entity.Cars, error) {
-	err := r.config.DB.Debug().Preload("Comparasion").Create(&otr).Error
+	err := r.config.DB.Preload("Comparasion").Create(&otr).Error
 
 	if err != nil {
 		return otr, err
@@ -92,7 +92,7 @@ func (r *OTRRepository) FindById(ID int) (entity.Cars, error) {
 func (r *OTRRepository) Delete(ID int) (bool, error) {
 	var otr entity.Cars
 
-	err := r.config.DB.Debug().Where("id = ?", ID).Delete(&otr).Error
+	err := r.config.DB.Where("id = ?", ID).Delete(&otr).Error
 
 	if err != nil {
 		return false, err

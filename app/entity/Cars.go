@@ -37,5 +37,6 @@ func (Cars) TableName() string {
 
 func (c *Cars) AfterFind(tx *gorm.DB) (err error) {
 	c.IsScraping = false
+	c.CreatedAtString = c.CreatedAt.Format("2006-01-02 15:04:05")
 	return
 }
