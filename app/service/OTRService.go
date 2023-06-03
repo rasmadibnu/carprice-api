@@ -3,6 +3,7 @@ package service
 import (
 	"api-cariprice/app/entity"
 	"api-cariprice/app/repository"
+	"time"
 )
 
 type OTRServices struct {
@@ -45,6 +46,7 @@ func (s *OTRServices) List() ([]entity.Cars, error) {
 // @Description : insert status to repository
 // @Author : rasmadibnu
 func (s *OTRServices) Insert(otr entity.Cars) (entity.Cars, error) {
+	otr.UpdateAt = time.Now()
 	newOTR, err := s.repository.Insert(otr)
 
 	if err != nil {
