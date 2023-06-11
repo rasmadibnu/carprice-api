@@ -74,7 +74,7 @@ func SearchCarmudi(query string, locations []entity.Location, filter string) ([]
 				Brand:       e.Attr("data-make"),
 				Model:       e.Attr("data-model"),
 				Detail:      strings.Join(detail, ","),
-				SourceName:  "Carmudi",
+				SourceName:  "carmudi.co.id",
 				IsScraping:  true,
 				SourceLink:  e.Attr("data-url"),
 			}
