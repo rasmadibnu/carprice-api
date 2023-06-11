@@ -22,9 +22,8 @@ func Contains(s []string, str string) bool {
 	return false
 }
 
-func SearchCariMobil(query string, filter string) ([]entity.Cars, []entity.Location, int) {
+func SearchCariMobil(query string, locations []entity.Location, filter string) ([]entity.Cars, []entity.Location, int) {
 	var cars []entity.Cars
-	var locations []entity.Location
 	var foundCariMobil int = 0
 
 	var pagesToScrape []string

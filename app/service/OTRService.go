@@ -3,6 +3,7 @@ package service
 import (
 	"api-cariprice/app/entity"
 	"api-cariprice/app/repository"
+	"api-cariprice/helper"
 	"time"
 )
 
@@ -19,14 +20,30 @@ func NewOTRServices(r repository.OTRRepository) OTRServices {
 // @Summary : Search otr
 // @Description : Search otr from repository
 // @Author : rasmadibnu
-func (s *OTRServices) Search(q string) ([]entity.Cars, int, error) {
-	status, err := s.repository.Search(q)
+func (s *OTRServices) Search(q string) ([]entity.Cars, int, []entity.Location, error) {
+	cars, err := s.repository.Search(q)
+
+	var locations []entity.Location
 
 	if err != nil {
-		return status, len(status), err
+		return cars, len(cars), locations, err
 	}
 
-	return status, len(status), nil
+	for _, car := range cars {
+
+		exists, index := helper.ContainsCity(locations, car.Location)
+		if exists {
+			locations[index].Count++
+		} else {
+			location := entity.Location{
+				Label: car.Location,
+				Count: 1,
+			}
+			locations = append(locations, location)
+		}
+	}
+
+	return cars, len(cars), locations, nil
 }
 
 // @Summary : List otr

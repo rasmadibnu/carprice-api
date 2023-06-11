@@ -36,18 +36,20 @@ func (controller SearchController) Index(ctx *gin.Context) {
 		m = append(m, k+"="+v[0])
 	}
 
-	otr, foundDatabase, _ := controller.service.Search(q)
-	cars, location, foundCariMobil := helper.SearchCariMobil(q, strings.Join(m, ""))
-	ety, locationOLX, foundOLX := helper.SearchOLX(q, location)
-	ap := append(otr, ety...)
-	ap = append(ap, cars...)
+	otr, foundDatabase, locationDB, _ := controller.service.Search(q)
+	cars, locationCarmudi, foundCariMobil := helper.SearchCariMobil(q, locationDB, strings.Join(m, ""))
+	olx, locationOLX, foundOLX := helper.SearchOLX(q, locationCarmudi)
+	carmudi, locationCarmudi, foundCarmudi := helper.SearchCarmudi(q, locationOLX, "")
+	ap := append(otr, olx...)
+	ap2 := append(ap, cars...)
+	ap3 := append(ap2, carmudi...)
 
 	var metadata entity.FilterOption
-	metadata.TotalData = len(ap)
-	metadata.Found = foundDatabase + foundCariMobil + foundOLX
-	metadata.Location = locationOLX
+	metadata.TotalData = len(ap3)
+	metadata.Found = foundDatabase + foundCariMobil + foundOLX + foundCarmudi
+	metadata.Location = locationCarmudi
 
-	resp := helper.SuccessJSON(ctx, "Scraping successfully", http.StatusOK, metadata, ap)
+	resp := helper.SuccessJSON(ctx, "Scraping successfully", http.StatusOK, metadata, ap3)
 
 	ctx.JSON(http.StatusOK, resp)
 
